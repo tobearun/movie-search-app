@@ -4,20 +4,21 @@ import StarRating from "@/components/StarRating";
 import Link from "next/link";
 import DarkModeToggle from "@/components/DarkModeToggle";
 
-type Props = {
-  params: {
-    id: string;
-  };
-};
-
-export default async function MovieDetailsPage({ params }: Props) {
+// ✅ This ensures the correct structure for App Router dynamic routes
+export default async function MovieDetailsPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const movie = await getMovieDetails(params.id);
 
   let recommendations = [];
   try {
     const genreKeyword = movie.Genre?.split(",")[0] || "action";
-    recommendations = await searchMovies(genreKeyword);
-    recommendations = recommendations.filter((m: any) => m.imdbID !== params.id).slice(0, 4);
+    const results = await searchMovies(genreKeyword);
+    recommendations = results
+      .filter((m: any) => m.imdbID !== params.id)
+      .slice(0, 4);
   } catch (err) {
     recommendations = [];
   }
@@ -40,10 +41,18 @@ export default async function MovieDetailsPage({ params }: Props) {
 
         <div className="flex-1">
           <h1 className="text-3xl font-bold mb-2">{movie.Title}</h1>
-          <p className="text-gray-400 mb-4">{movie.Year} • {movie.Genre}</p>
-          <p><strong>Director:</strong> {movie.Director}</p>
-          <p><strong>Actors:</strong> {movie.Actors}</p>
-          <p className="mt-4"><strong>Plot:</strong> {movie.Plot}</p>
+          <p className="text-gray-400 mb-4">
+            {movie.Year} • {movie.Genre}
+          </p>
+          <p>
+            <strong>Director:</strong> {movie.Director}
+          </p>
+          <p>
+            <strong>Actors:</strong> {movie.Actors}
+          </p>
+          <p className="mt-4">
+            <strong>Plot:</strong> {movie.Plot}
+          </p>
           <StarRating movieId={movie.imdbID} />
         </div>
       </div>
@@ -62,7 +71,9 @@ export default async function MovieDetailsPage({ params }: Props) {
                     height={300}
                     className="rounded w-full h-[300px] object-cover"
                   />
-                  <p className="mt-2 text-sm text-gray-300 truncate">{rec.Title}</p>
+                  <p className="mt-2 text-sm text-gray-300 truncate">
+                    {rec.Title}
+                  </p>
                   <p className="text-xs text-gray-500">{rec.Year}</p>
                 </div>
               </Link>
