@@ -1,8 +1,6 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { searchMovies } from "@/lib/api";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,7 +9,15 @@ import debounce from "lodash.debounce";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function MovieSearchPage() {
+export default function MovieSearchPageWrapper() {
+  return (
+    <Suspense fallback={<div className="text-white px-6 py-10">Loading search...</div>}>
+      <MovieSearchPage />
+    </Suspense>
+  );
+}
+
+function MovieSearchPage() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("query") || "";
 
