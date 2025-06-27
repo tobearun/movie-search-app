@@ -65,7 +65,9 @@ export default function HomePage() {
               <div
                 key={movie.imdbID}
                 className="flex items-center gap-3 px-4 py-2 hover:bg-muted cursor-pointer"
-                onClick={() => router.push(`/movies/${movie.imdbID}`)}
+                onClick={() =>
+                  router.push(`/movies/${movie.imdbID}?query=${encodeURIComponent(query)}`)
+                }
               >
                 <Image
                   src={movie.Poster !== "N/A" ? movie.Poster : "/no-image.png"}

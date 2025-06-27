@@ -5,12 +5,15 @@ import { searchMovies } from "@/lib/api";
 import Image from "next/image";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import { debounce } from "lodash";
+import debounce from "lodash.debounce";
 import DarkModeToggle from "@/components/DarkModeToggle";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function MovieSearchPage() {
-  const [query, setQuery] = useState("avengers");
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("query") || "";
+
+  const [query, setQuery] = useState(initialQuery);
   const [movies, setMovies] = useState<any[]>([]);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -43,8 +46,10 @@ export default function MovieSearchPage() {
   }, 300);
 
   useEffect(() => {
-    fetchMovies(query);
-  }, []);
+    if (initialQuery) {
+      fetchMovies(initialQuery);
+    }
+  }, [initialQuery]);
 
   return (
     <div className="bg-background text-white min-h-screen px-6 py-10 transition-colors duration-300">
@@ -65,8 +70,8 @@ export default function MovieSearchPage() {
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              setSuggestions([]); // Hide suggestions
-              fetchMovies(query);
+              setSuggestions([]);
+              router.push(`/movies?query=${encodeURIComponent(query)}`);
             }
           }}
         />
@@ -78,7 +83,7 @@ export default function MovieSearchPage() {
                 key={movie.imdbID}
                 className="flex items-center gap-3 px-4 py-2 hover:bg-muted cursor-pointer"
                 onClick={() => {
-                  router.push(`/movies/${movie.imdbID}`);
+                  router.push(`/movies/${movie.imdbID}?query=${encodeURIComponent(query)}`);
                 }}
               >
                 <Image
@@ -100,7 +105,10 @@ export default function MovieSearchPage() {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6">
         {movies.map((movie) => (
-          <Link key={movie.imdbID} href={`/movies/${movie.imdbID}`}>
+          <Link
+            key={movie.imdbID}
+            href={`/movies/${movie.imdbID}?query=${encodeURIComponent(query)}`}
+          >
             <div className="group relative overflow-hidden rounded-lg hover:scale-105 transition transform duration-300">
               <Image
                 src={movie.Poster !== "N/A" ? movie.Poster : "/no-image.png"}
