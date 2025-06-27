@@ -5,18 +5,20 @@ import Link from "next/link";
 import DarkModeToggle from "@/components/DarkModeToggle";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function MovieDetailsPage({ params }: PageProps) {
-  const movie = await getMovieDetails(params.id);
+  const { id } = await params;
+
+  const movie = await getMovieDetails(id);
 
   let recommendations = [];
   try {
     const genreKeyword = movie.Genre?.split(",")[0] || "action";
     const results = await searchMovies(genreKeyword);
     recommendations = results
-      .filter((m: any) => m.imdbID !== params.id)
+      .filter((m: any) => m.imdbID !== id)
       .slice(0, 4);
   } catch (err) {
     recommendations = [];
