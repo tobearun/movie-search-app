@@ -3,13 +3,26 @@
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { ReactNode } from "react";
 
-interface ThemeProviderProps {
+interface CustomThemeProviderProps {
   children: ReactNode;
-  attribute: "class" | "style";
+  attribute?: "class";
   defaultTheme?: string;
   enableSystem?: boolean;
 }
 
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+export function ThemeProvider({
+  children,
+  attribute = "class",
+  defaultTheme = "system",
+  enableSystem = true,
+}: CustomThemeProviderProps) {
+  return (
+    <NextThemesProvider
+      attribute={attribute}
+      defaultTheme={defaultTheme}
+      enableSystem={enableSystem}
+    >
+      {children}
+    </NextThemesProvider>
+  );
 }
